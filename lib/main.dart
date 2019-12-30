@@ -40,15 +40,30 @@ class RemoveAllAction {
 
 AppState reducer(AppState state, Object action) {
   if (action is AddWordAction) {
-    return AppState(items: state.items..add(action.input));
+    return AppState(
+      items: state.items..add(action.input),
+      number: state.number,
+    );
   } else if (action is RemoveWordAction) {
-    return AppState(items: state.items..remove(action.item));
+    return AppState(
+      items: state.items..remove(action.item),
+      number: state.number,
+    );
   } else if (action is RemoveAllAction) {
-    return AppState(items: <String>[]);
+    return AppState(
+      items: <String>[],
+      number: state.number,
+    );
   } else if (action is PlusOneAction) {
-    return AppState(number: action.number + 1);
+    return AppState(
+      items: state.items,
+      number: action.number + 1,
+    );
   } else if (action is MinusOneAction) {
-    return AppState(number: action.number - 1);
+    return AppState(
+      items: state.items,
+      number: action.number - 1,
+    );
   }
   return AppState(items: state.items, number: state.number);
 }
@@ -67,7 +82,7 @@ class MyApp extends StatelessWidget {
         title: 'Flutter Redux Demo',
         theme: ThemeData.dark(),
         initialRoute: HomePage.id,
-        routes: {
+        routes: <String, Widget Function(BuildContext)>{
           HomePage.id: (BuildContext context) => HomePage(),
           WordPage.id: (BuildContext context) => WordPage(),
           NumberPage.id: (BuildContext context) => NumberPage(),
