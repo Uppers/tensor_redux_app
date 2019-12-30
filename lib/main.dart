@@ -3,18 +3,34 @@ import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
 
 class AppState {
-  AppState({this.items});
-  AppState.initialState() : items = <String>[];
+  AppState({
+    this.items,
+    this.number,
+  });
+  AppState.initialState()
+      : items = <String>[],
+        number = 0;
   final List<String> items;
+  final int number;
 }
 
-class AddAction {
-  AddAction({this.input});
+class PlusOneAction {
+  PlusOneAction({this.number});
+  final int number;
+}
+
+class MinusOneAction {
+  MinusOneAction({this.number});
+  final int number;
+}
+
+class AddWordAction {
+  AddWordAction({this.input});
   final String input;
 }
 
-class RemoveAction {
-  RemoveAction({this.item});
+class RemoveWordAction {
+  RemoveWordAction({this.item});
   final String item;
 }
 
@@ -23,14 +39,18 @@ class RemoveAllAction {
 }
 
 AppState reducer(AppState state, Object action) {
-  if (action is AddAction) {
+  if (action is AddWordAction) {
     return AppState(items: state.items..add(action.input));
-  } else if (action is RemoveAction) {
+  } else if (action is RemoveWordAction) {
     return AppState(items: state.items..remove(action.item));
   } else if (action is RemoveAllAction) {
     return AppState(items: <String>[]);
+  } else if (action is PlusOneAction) {
+    return AppState(number: action.number + 1);
+  } else if (action is MinusOneAction) {
+    return AppState(number: action.number - 1);
   }
-  return AppState(items: state.items);
+  return AppState(items: state.items, number: state.number);
 }
 
 void main() => runApp(MyApp());
@@ -91,27 +111,30 @@ class NumberPage extends StatelessWidget {
   static String id = 'number_page';
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Number Page'),
-      ),
-      body: Center(
-        child: Column(
-          children: <Widget>[
-            Text('0'),
-            Row(
-              children: <Widget>[
-                IconButton(
-                  icon: Icon(Icons.add),
-                  onPressed: () {},
-                ),
-                IconButton(
-                  icon: Icon(Icons.remove),
-                  onPressed: () {},
-                ),
-              ],
-            ),
-          ],
+    return StoreConnector<AppState, _ViewModel>(
+      converter: (Store<AppState> store) => _ViewModel.create(store),
+      builder: (BuildContext context, _ViewModel viewModel) => Scaffold(
+        appBar: AppBar(
+          title: const Text('Number Page'),
+        ),
+        body: Center(
+          child: Column(
+            children: <Widget>[
+              Text('${viewModel.number}'),
+              Row(
+                children: <Widget>[
+                  IconButton(
+                    icon: Icon(Icons.add),
+                    onPressed: () => viewModel.onPlusOne(viewModel.number),
+                  ),
+                  IconButton(
+                    icon: Icon(Icons.remove),
+                    onPressed: () => viewModel.onMinusOne(viewModel.number),
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -142,36 +165,53 @@ class WordPage extends StatelessWidget {
 class _ViewModel {
   _ViewModel({
     this.items,
+    this.number,
     this.onAddItem,
     this.onRemoveItem,
     this.onRemoveAll,
+    this.onPlusOne,
+    this.onMinusOne,
   });
 
   factory _ViewModel.create(Store<AppState> store) {
     void _onAddItem(String body) {
-      store.dispatch(AddAction(input: body));
+      store.dispatch(AddWordAction(input: body));
     }
 
     void _onRemoveItem(String body) {
-      store.dispatch(RemoveAction(item: body));
+      store.dispatch(RemoveWordAction(item: body));
     }
 
     void _onRemoveAll() {
       store.dispatch(RemoveAllAction());
     }
 
+    void _onPlusOne(int body) {
+      store.dispatch(PlusOneAction(number: body));
+    }
+
+    void _onMinusOne(int body) {
+      store.dispatch(MinusOneAction(number: body));
+    }
+
     return _ViewModel(
       items: store.state.items,
+      number: store.state.number,
       onAddItem: _onAddItem,
       onRemoveItem: _onRemoveItem,
       onRemoveAll: _onRemoveAll,
+      onPlusOne: _onPlusOne,
+      onMinusOne: _onMinusOne,
     );
   }
 
   final List<String> items;
+  final int number;
   final Function(String) onAddItem;
   final Function(String) onRemoveItem;
   final Function() onRemoveAll;
+  final Function(int) onPlusOne;
+  final Function(int) onMinusOne;
 }
 
 class ListInput extends StatelessWidget {
