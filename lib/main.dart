@@ -46,18 +46,85 @@ class MyApp extends StatelessWidget {
       child: MaterialApp(
         title: 'Flutter Redux Demo',
         theme: ThemeData.dark(),
-        home: MyHomePage(),
+        initialRoute: HomePage.id,
+        routes: {
+          HomePage.id: (BuildContext context) => HomePage(),
+          WordPage.id: (BuildContext context) => WordPage(),
+          NumberPage.id: (BuildContext context) => NumberPage(),
+        },
       ),
     );
   }
 }
 
-class MyHomePage extends StatelessWidget {
+class HomePage extends StatelessWidget {
+  static String id = 'home_page';
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Redux Items'),
+        title: const Text('Choose a Redux Option'),
+      ),
+      body: Center(
+        child: Column(
+          children: <Widget>[
+            RaisedButton(
+              child: const Text('Word Lister'),
+              onPressed: () {
+                Navigator.pushNamed(context, WordPage.id);
+              },
+            ),
+            RaisedButton(
+              child: const Text('Number Thing'),
+              onPressed: () {
+                Navigator.pushNamed(context, NumberPage.id);
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class NumberPage extends StatelessWidget {
+  static String id = 'number_page';
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Number Page'),
+      ),
+      body: Center(
+        child: Column(
+          children: <Widget>[
+            Text('0'),
+            Row(
+              children: <Widget>[
+                IconButton(
+                  icon: Icon(Icons.add),
+                  onPressed: () {},
+                ),
+                IconButton(
+                  icon: Icon(Icons.remove),
+                  onPressed: () {},
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class WordPage extends StatelessWidget {
+  static String id = 'word_list_page';
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Word List'),
       ),
       body: Center(
         child: Column(
